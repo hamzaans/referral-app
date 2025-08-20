@@ -1,0 +1,15 @@
+[Unit]
+Description=Medical Referral Finder Flask App
+After=network.target
+
+[Service]
+Type=simple
+User=hamzaans
+WorkingDirectory=/home/hamzaans/referral-app
+Environment=PATH=/home/hamzaans/referral-app/venv/bin
+ExecStart=/home/hamzaans/referral-app/venv/bin/python app.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
