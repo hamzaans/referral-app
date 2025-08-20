@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Referral Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c5aa0;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            font-size: 16px;
+            color: #4a5568;
+            transition: border-color 0.2s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .search-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .search-btn:hover {
+            background: #3182ce;
+        }
+
+        .search-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-header {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .doctor-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .doctor-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .doctor-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-bottom: 12px;
+        }
+
+        .doctor-info {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #4a5568;
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #4299e1;
+            font-size: 1.1em;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #feb2b2;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #9ae6b4;
+        }
+
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            z-index: 1000;
+        }
+
+        .admin-btn:hover {
+            background: #3182ce;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2c5aa0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-col input, .form-col select, .form-col textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-col label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .insurance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .insurance-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insurance-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
+        .doctor-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .doctor-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .doctor-item:last-child {
+            border-bottom: none;
+        }
+
+        .doctor-item:hover {
+            background: #f7fafc;
+        }
+
+        .doctor-item-info {
+            flex: 1;
+        }
+
+        .doctor-item-name {
+            font-weight: 600;
+            color: #2c5aa0;
+        }
+
+        .doctor-item-specialty {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .doctor-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #dd6b20;
+        }
+
+        .btn-delete {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c53030;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .doctor-info {
+                flex-direction: column;
+            }
+            
+            .info-label {
+                width: auto;
+                margin-bottom: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="admin-btn" onclick="openAdminModal()">Admin</button>
+    
+    <div class="container">
+        <h1>Medical Referral Finder</h1>
+        
+        <div class="form-section">
+            <div class="form-group">
+                <label for="specialty">Medical Specialty:</label>
+                <select id="specialty">
+                    <option value="">Select a specialty...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="insurance">Insurance:</label>
+                <select id="insurance">
+                    <option value="">Select insurance...</option>
+                </select>
+            </div>
+            
+            <button class="search-btn" onclick="searchDoctors()">Find Doctors</button>
+        </div>
+        
+        <div id="results" class="results-section" style="display: none;">
+            <div class="results-header">Search Results</div>
+            <div id="results-content"></div>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Doctor Management</div>
+                <button class="close-btn" onclick="closeAdminModal()">&times;</button>
+            </div>
+            
+            <div class="btn-group" style="justify-content: flex-start; margin-bottom: 20px;">
+                <button class="search-btn" onclick="openAddDoctorModal()" style="width: auto;">Add New Doctor</button>
+            </div>
+            
+            <div class="doctor-list" id="doctorList">
+                <!-- Doctor list will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Doctor Modal -->
+    <div id="doctorFormModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="doctorFormTitle">Add New Doctor</div>
+                <button class="close-btn" onclick="closeDoctorFormModal()">&times;</button>
+            </div>
+            
+            <form id="doctorForm">
+                <div id="formMessages"></div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="doctorName">Doctor Name:</label>
+                        <input type="text" id="doctorName" required>
+                    </div>
+                    <div class="form-col">
+                        <label for="doctorSpecialty">Specialty:</label>
+                        <input type="text" id="doctorSpecialty" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="doctorAddress">Address:</label>
+                        <textarea id="doctorAddress" rows="3" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="doctorPhone">Phone:</label>
+                        <input type="text" id="doctorPhone" required>
+                    </div>
+                    <div class="form-col">
+                        <label for="doctorFax">Fax:</label>
+                        <input type="text" id="doctorFax" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <label>Insurance Accepted:</label>
+                        <div class="insurance-grid">
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_carefirst">
+                                <label for="takes_carefirst">CareFirst</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_united_healthcare">
+                                <label for="takes_united_healthcare">United Healthcare</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_aetna">
+                                <label for="takes_aetna">Aetna</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_cigna">
+                                <label for="takes_cigna">Cigna</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_bcbs">
+                                <label for="takes_bcbs">Blue Cross Blue Shield</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_medicare">
+                                <label for="takes_medicare">Medicare</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_medicaid">
+                                <label for="takes_medicaid">Medicaid</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn-secondary" onclick="closeDoctorFormModal()">Cancel</button>
+                    <button type="submit" class="search-btn" style="width: auto;">Save Doctor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Load specialties and insurances on page load
+        window.onload = function() {
+            loadSpecialties();
+            loadInsurances();
+        };
+
+        async function loadSpecialties() {
+            try {
+                const response = await fetch('/api/specialties');
+                const specialties = await response.json();
+                const select = document.getElementById('specialty');
+                
+                specialties.forEach(specialty => {
+                    const option = document.createElement('option');
+                    option.value = specialty;
+                    option.textContent = specialty;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading specialties:', error);
+            }
+        }
+
+        async function loadInsurances() {
+            try {
+                const response = await fetch('/api/insurances');
+                const insurances = await response.json();
+                const select = document.getElementById('insurance');
+                
+                insurances.forEach(insurance => {
+                    const option = document.createElement('option');
+                    option.value = insurance;
+                    option.textContent = formatInsuranceName(insurance);
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading insurances:', error);
+            }
+        }
+
+        function formatInsuranceName(insurance) {
+            const names = {
+                'carefirst': 'CareFirst',
+                'united_healthcare': 'United Healthcare',
+                'aetna': 'Aetna',
+                'cigna': 'Cigna',
+                'bcbs': 'Blue Cross Blue Shield',
+                'medicare': 'Medicare',
+                'medicaid': 'Medicaid'
+            };
+            return names[insurance] || insurance;
+        }
+
+        async function searchDoctors() {
+            const specialty = document.getElementById('specialty').value;
+            const insurance = document.getElementById('insurance').value;
+            const resultsDiv = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            
+            if (!specialty || !insurance) {
+                alert('Please select both a specialty and insurance type.');
+                return;
+            }
+            
+            // Show loading
+            resultsDiv.style.display = 'block';
+            resultsContent.innerHTML = '<div class="loading">Searching for doctors...</div>';
+            
+            try {
+                const response = await fetch(`/api/doctors?specialty=${encodeURIComponent(specialty)}&insurance=${encodeURIComponent(insurance)}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    resultsContent.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error searching doctors:', error);
+                resultsContent.innerHTML = '<div class="error">An error occurred while searching. Please try again.</div>';
+            }
+        }
+
+        function displayResults(doctors) {
+            const resultsContent = document.getElementById('results-content');
+            
+            if (doctors.length === 0) {
+                resultsContent.innerHTML = '<div class="no-results">No doctors found matching your criteria.</div>';
+                return;
+            }
+            
+            let html = '';
+            doctors.forEach(doctor => {
+                html += `
+                    <div class="doctor-card">
+                        <div class="doctor-name">${doctor.name}</div>
+                        <div class="doctor-info">
+                            <span class="info-label">Address:</span>
+                            <span class="info-value">${doctor.address}</span>
+                        </div>
+                        <div class="doctor-info">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value">${doctor.phone}</span>
+                        </div>
+                        <div class="doctor-info">
+                            <span class="info-label">Fax:</span>
+                            <span class="info-value">${doctor.fax}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContent.innerHTML = html;
+        }
+
+        // Admin functionality
+        let currentEditingDoctorId = null;
+
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'block';
+            loadAllDoctors();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function openAddDoctorModal() {
+            currentEditingDoctorId = null;
+            document.getElementById('doctorFormTitle').textContent = 'Add New Doctor';
+            document.getElementById('doctorForm').reset();
+            document.getElementById('formMessages').innerHTML = '';
+            document.getElementById('doctorFormModal').style.display = 'block';
+        }
+
+        function openEditDoctorModal(doctor) {
+            currentEditingDoctorId = doctor.id;
+            document.getElementById('doctorFormTitle').textContent = 'Edit Doctor';
+            
+            // Populate form with doctor data
+            document.getElementById('doctorName').value = doctor.name;
+            document.getElementById('doctorSpecialty').value = doctor.specialty;
+            document.getElementById('doctorAddress').value = doctor.address;
+            document.getElementById('doctorPhone').value = doctor.phone;
+            document.getElementById('doctorFax').value = doctor.fax;
+            
+            // Set insurance checkboxes
+            document.getElementById('takes_carefirst').checked = doctor.insurance.carefirst;
+            document.getElementById('takes_united_healthcare').checked = doctor.insurance.united_healthcare;
+            document.getElementById('takes_aetna').checked = doctor.insurance.aetna;
+            document.getElementById('takes_cigna').checked = doctor.insurance.cigna;
+            document.getElementById('takes_bcbs').checked = doctor.insurance.bcbs;
+            document.getElementById('takes_medicare').checked = doctor.insurance.medicare;
+            document.getElementById('takes_medicaid').checked = doctor.insurance.medicaid;
+            
+            document.getElementById('formMessages').innerHTML = '';
+            document.getElementById('doctorFormModal').style.display = 'block';
+        }
+
+        function closeDoctorFormModal() {
+            document.getElementById('doctorFormModal').style.display = 'none';
+        }
+
+        async function loadAllDoctors() {
+            try {
+                const response = await fetch('/api/doctors/all');
+                const doctors = await response.json();
+                displayDoctorList(doctors);
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+            }
+        }
+
+        function displayDoctorList(doctors) {
+            const doctorList = document.getElementById('doctorList');
+            
+            if (doctors.length === 0) {
+                doctorList.innerHTML = '<div style="padding: 20px; text-align: center; color: #718096;">No doctors found.</div>';
+                return;
+            }
+            
+            let html = '';
+            doctors.forEach(doctor => {
+                const insuranceList = Object.entries(doctor.insurance)
+                    .filter(([key, value]) => value)
+                    .map(([key, value]) => formatInsuranceName(key))
+                    .join(', ');
+                
+                html += `
+                    <div class="doctor-item">
+                        <div class="doctor-item-info">
+                            <div class="doctor-item-name">${doctor.name}</div>
+                            <div class="doctor-item-specialty">${doctor.specialty}</div>
+                            <div style="font-size: 0.8em; color: #4a5568; margin-top: 4px;">
+                                Insurance: ${insuranceList || 'None specified'}
+                            </div>
+                        </div>
+                        <div class="doctor-item-actions">
+                            <button class="btn-small btn-edit" onclick="openEditDoctorModal(${JSON.stringify(doctor).replace(/"/g, '&quot;')})">Edit</button>
+                            <button class="btn-small btn-delete" onclick="deleteDoctor(${doctor.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            doctorList.innerHTML = html;
+        }
+
+        // Handle form submission
+        document.getElementById('doctorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('doctorName').value,
+                specialty: document.getElementById('doctorSpecialty').value,
+                address: document.getElementById('doctorAddress').value,
+                phone: document.getElementById('doctorPhone').value,
+                fax: document.getElementById('doctorFax').value,
+                takes_carefirst: document.getElementById('takes_carefirst').checked,
+                takes_united_healthcare: document.getElementById('takes_united_healthcare').checked,
+                takes_aetna: document.getElementById('takes_aetna').checked,
+                takes_cigna: document.getElementById('takes_cigna').checked,
+                takes_bcbs: document.getElementById('takes_bcbs').checked,
+                takes_medicare: document.getElementById('takes_medicare').checked,
+                takes_medicaid: document.getElementById('takes_medicaid').checked
+            };
+            
+            try {
+                let response;
+                if (currentEditingDoctorId) {
+                    // Update existing doctor
+                    response = await fetch(`/api/doctors/${currentEditingDoctorId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    // Add new doctor
+                    response = await fetch('/api/doctors', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('formMessages').innerHTML = `
+                        <div class="success">${result.message}</div>
+                    `;
+                    setTimeout(() => {
+                        closeDoctorFormModal();
+                        loadAllDoctors();
+                        // Refresh the specialty dropdown in case a new specialty was added
+                        loadSpecialties();
+                    }, 1500);
+                } else {
+                    document.getElementById('formMessages').innerHTML = `
+                        <div class="error">Error: ${result.error}</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('formMessages').innerHTML = `
+                    <div class="error">An error occurred. Please try again.</div>
+                `;
+                console.error('Error saving doctor:', error);
+            }
+        });
+
+        async function deleteDoctor(doctorId) {
+            if (!confirm('Are you sure you want to delete this doctor? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/doctors/${doctorId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    loadAllDoctors();
+                    // Refresh the specialty dropdown in case we deleted the last doctor of a specialty
+                    loadSpecialties();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert('An error occurred while deleting the doctor.');
+                console.error('Error deleting doctor:', error);
+            }
+        }
+
+        // Close modals when clicking outside of them
+        window.addEventListener('click', function(event) {
+            const adminModal = document.getElementById('adminModal');
+            const doctorFormModal = document.getElementById('doctorFormModal');
+            
+            if (event.target === adminModal) {
+                closeAdminModal();
+            }
+            if (event.target === doctorFormModal) {
+                closeDoctorFormModal();
+            }
+        });
+    </script>
+</body>
+</html>
