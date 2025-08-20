@@ -495,32 +495,56 @@
                         <label>Insurance Accepted:</label>
                         <div class="insurance-grid">
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_carefirst">
-                                <label for="takes_carefirst">CareFirst</label>
+                                <input type="checkbox" id="takes_carefirst_community_healthplan">
+                                <label for="takes_carefirst_community_healthplan">CareFirst Community Healthplan (Medicaid)</label>
                             </div>
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_united_healthcare">
-                                <label for="takes_united_healthcare">United Healthcare</label>
+                                <input type="checkbox" id="takes_united_healthcare_community">
+                                <label for="takes_united_healthcare_community">United Healthcare Community (Medicaid)</label>
                             </div>
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_aetna">
-                                <label for="takes_aetna">Aetna</label>
+                                <input type="checkbox" id="takes_priority_partners">
+                                <label for="takes_priority_partners">Priority Partners (Medicaid)</label>
                             </div>
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_cigna">
-                                <label for="takes_cigna">Cigna</label>
+                                <input type="checkbox" id="takes_maryland_physicians_care">
+                                <label for="takes_maryland_physicians_care">Maryland Physicians Care (Medicaid)</label>
                             </div>
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_bcbs">
-                                <label for="takes_bcbs">Blue Cross Blue Shield</label>
+                                <input type="checkbox" id="takes_aetna_betterhealth">
+                                <label for="takes_aetna_betterhealth">Aetna BetterHealth (Medicaid)</label>
                             </div>
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_medicare">
-                                <label for="takes_medicare">Medicare</label>
+                                <input type="checkbox" id="takes_maryland_medical_assistance">
+                                <label for="takes_maryland_medical_assistance">Maryland Medical Assistance (Medicaid)</label>
                             </div>
                             <div class="insurance-item">
-                                <input type="checkbox" id="takes_medicaid">
-                                <label for="takes_medicaid">Medicaid</label>
+                                <input type="checkbox" id="takes_wellpoint">
+                                <label for="takes_wellpoint">Wellpoint (Medicaid)</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_aetna_medicare">
+                                <label for="takes_aetna_medicare">Aetna Medicare (Medicare Advantage)</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_carefirst_medicare">
+                                <label for="takes_carefirst_medicare">CareFirst Medicare (Medicare Advantage)</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_cigna_medicare">
+                                <label for="takes_cigna_medicare">Cigna Medicare (Medicare Advantage)</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_humana">
+                                <label for="takes_humana">Humana (Medicare Advantage)</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_john_hopkins">
+                                <label for="takes_john_hopkins">John Hopkins (Medicare Advantage)</label>
+                            </div>
+                            <div class="insurance-item">
+                                <input type="checkbox" id="takes_united_healthcare_medicare">
+                                <label for="takes_united_healthcare_medicare">United Healthcare Medicare (Medicare Advantage)</label>
                             </div>
                         </div>
                     </div>
@@ -603,13 +627,19 @@
 
         function formatInsuranceName(insurance) {
             const names = {
-                'carefirst': 'CareFirst',
-                'united_healthcare': 'United Healthcare',
-                'aetna': 'Aetna',
-                'cigna': 'Cigna',
-                'bcbs': 'Blue Cross Blue Shield',
-                'medicare': 'Medicare',
-                'medicaid': 'Medicaid'
+                'carefirst_community_healthplan': 'CareFirst Community Healthplan (Medicaid)',
+                'united_healthcare_community': 'United Healthcare Community (Medicaid)',
+                'priority_partners': 'Priority Partners (Medicaid)',
+                'maryland_physicians_care': 'Maryland Physicians Care (Medicaid)',
+                'aetna_betterhealth': 'Aetna BetterHealth (Medicaid)',
+                'maryland_medical_assistance': 'Maryland Medical Assistance (Medicaid)',
+                'wellpoint': 'Wellpoint (Medicaid)',
+                'aetna_medicare': 'Aetna Medicare (Medicare Advantage)',
+                'carefirst_medicare': 'CareFirst Medicare (Medicare Advantage)',
+                'cigna_medicare': 'Cigna Medicare (Medicare Advantage)',
+                'humana': 'Humana (Medicare Advantage)',
+                'john_hopkins': 'John Hopkins (Medicare Advantage)',
+                'united_healthcare_medicare': 'United Healthcare Medicare (Medicare Advantage)'
             };
             return names[insurance] || insurance;
         }
@@ -710,13 +740,19 @@
                 document.getElementById('doctorFax').value = doctor.fax;
             
                 // Set insurance checkboxes
-                document.getElementById('takes_carefirst').checked = doctor.insurance.carefirst;
-                document.getElementById('takes_united_healthcare').checked = doctor.insurance.united_healthcare;
-                document.getElementById('takes_aetna').checked = doctor.insurance.aetna;
-                document.getElementById('takes_cigna').checked = doctor.insurance.cigna;
-                document.getElementById('takes_bcbs').checked = doctor.insurance.bcbs;
-                document.getElementById('takes_medicare').checked = doctor.insurance.medicare;
-                document.getElementById('takes_medicaid').checked = doctor.insurance.medicaid;
+                document.getElementById('takes_carefirst_community_healthplan').checked = doctor.insurance.carefirst_community_healthplan;
+                document.getElementById('takes_united_healthcare_community').checked = doctor.insurance.united_healthcare_community;
+                document.getElementById('takes_priority_partners').checked = doctor.insurance.priority_partners;
+                document.getElementById('takes_maryland_physicians_care').checked = doctor.insurance.maryland_physicians_care;
+                document.getElementById('takes_aetna_betterhealth').checked = doctor.insurance.aetna_betterhealth;
+                document.getElementById('takes_maryland_medical_assistance').checked = doctor.insurance.maryland_medical_assistance;
+                document.getElementById('takes_wellpoint').checked = doctor.insurance.wellpoint;
+                document.getElementById('takes_aetna_medicare').checked = doctor.insurance.aetna_medicare;
+                document.getElementById('takes_carefirst_medicare').checked = doctor.insurance.carefirst_medicare;
+                document.getElementById('takes_cigna_medicare').checked = doctor.insurance.cigna_medicare;
+                document.getElementById('takes_humana').checked = doctor.insurance.humana;
+                document.getElementById('takes_john_hopkins').checked = doctor.insurance.john_hopkins;
+                document.getElementById('takes_united_healthcare_medicare').checked = doctor.insurance.united_healthcare_medicare;
             });
             
             document.getElementById('formMessages').innerHTML = '';
@@ -782,13 +818,19 @@
                 address: document.getElementById('doctorAddress').value,
                 phone: document.getElementById('doctorPhone').value,
                 fax: document.getElementById('doctorFax').value,
-                takes_carefirst: document.getElementById('takes_carefirst').checked,
-                takes_united_healthcare: document.getElementById('takes_united_healthcare').checked,
-                takes_aetna: document.getElementById('takes_aetna').checked,
-                takes_cigna: document.getElementById('takes_cigna').checked,
-                takes_bcbs: document.getElementById('takes_bcbs').checked,
-                takes_medicare: document.getElementById('takes_medicare').checked,
-                takes_medicaid: document.getElementById('takes_medicaid').checked
+                takes_carefirst_community_healthplan: document.getElementById('takes_carefirst_community_healthplan').checked,
+                takes_united_healthcare_community: document.getElementById('takes_united_healthcare_community').checked,
+                takes_priority_partners: document.getElementById('takes_priority_partners').checked,
+                takes_maryland_physicians_care: document.getElementById('takes_maryland_physicians_care').checked,
+                takes_aetna_betterhealth: document.getElementById('takes_aetna_betterhealth').checked,
+                takes_maryland_medical_assistance: document.getElementById('takes_maryland_medical_assistance').checked,
+                takes_wellpoint: document.getElementById('takes_wellpoint').checked,
+                takes_aetna_medicare: document.getElementById('takes_aetna_medicare').checked,
+                takes_carefirst_medicare: document.getElementById('takes_carefirst_medicare').checked,
+                takes_cigna_medicare: document.getElementById('takes_cigna_medicare').checked,
+                takes_humana: document.getElementById('takes_humana').checked,
+                takes_john_hopkins: document.getElementById('takes_john_hopkins').checked,
+                takes_united_healthcare_medicare: document.getElementById('takes_united_healthcare_medicare').checked
             };
             
             try {

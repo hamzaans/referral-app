@@ -23,13 +23,19 @@ class Doctor(db.Model):
     fax = db.Column(db.String(20), nullable=False)
     
     # Insurance acceptance fields (boolean for each insurance)
-    takes_carefirst = db.Column(db.Boolean, default=False)
-    takes_united_healthcare = db.Column(db.Boolean, default=False)
-    takes_aetna = db.Column(db.Boolean, default=False)
-    takes_cigna = db.Column(db.Boolean, default=False)
-    takes_bcbs = db.Column(db.Boolean, default=False)
-    takes_medicare = db.Column(db.Boolean, default=False)
-    takes_medicaid = db.Column(db.Boolean, default=False)
+    takes_carefirst_community_healthplan = db.Column(db.Boolean, default=False)
+    takes_united_healthcare_community = db.Column(db.Boolean, default=False)
+    takes_priority_partners = db.Column(db.Boolean, default=False)
+    takes_maryland_physicians_care = db.Column(db.Boolean, default=False)
+    takes_aetna_betterhealth = db.Column(db.Boolean, default=False)
+    takes_maryland_medical_assistance = db.Column(db.Boolean, default=False)
+    takes_wellpoint = db.Column(db.Boolean, default=False)
+    takes_aetna_medicare = db.Column(db.Boolean, default=False)
+    takes_carefirst_medicare = db.Column(db.Boolean, default=False)
+    takes_cigna_medicare = db.Column(db.Boolean, default=False)
+    takes_humana = db.Column(db.Boolean, default=False)
+    takes_john_hopkins = db.Column(db.Boolean, default=False)
+    takes_united_healthcare_medicare = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
         return {
@@ -40,13 +46,19 @@ class Doctor(db.Model):
             'phone': self.phone,
             'fax': self.fax,
             'insurance': {
-                'carefirst': self.takes_carefirst,
-                'united_healthcare': self.takes_united_healthcare,
-                'aetna': self.takes_aetna,
-                'cigna': self.takes_cigna,
-                'bcbs': self.takes_bcbs,
-                'medicare': self.takes_medicare,
-                'medicaid': self.takes_medicaid
+                'carefirst_community_healthplan': self.takes_carefirst_community_healthplan,
+                'united_healthcare_community': self.takes_united_healthcare_community,
+                'priority_partners': self.takes_priority_partners,
+                'maryland_physicians_care': self.takes_maryland_physicians_care,
+                'aetna_betterhealth': self.takes_aetna_betterhealth,
+                'maryland_medical_assistance': self.takes_maryland_medical_assistance,
+                'wellpoint': self.takes_wellpoint,
+                'aetna_medicare': self.takes_aetna_medicare,
+                'carefirst_medicare': self.takes_carefirst_medicare,
+                'cigna_medicare': self.takes_cigna_medicare,
+                'humana': self.takes_humana,
+                'john_hopkins': self.takes_john_hopkins,
+                'united_healthcare_medicare': self.takes_united_healthcare_medicare
             }
         }
 
@@ -98,13 +110,19 @@ def get_specialties():
 def get_insurances():
     """Get all available insurance options"""
     return jsonify([
-        'carefirst',
-        'united_healthcare', 
-        'aetna',
-        'cigna',
-        'bcbs',
-        'medicare',
-        'medicaid'
+        'carefirst_community_healthplan',
+        'united_healthcare_community',
+        'priority_partners',
+        'maryland_physicians_care',
+        'aetna_betterhealth',
+        'maryland_medical_assistance',
+        'wellpoint',
+        'aetna_medicare',
+        'carefirst_medicare',
+        'cigna_medicare',
+        'humana',
+        'john_hopkins',
+        'united_healthcare_medicare'
     ])
 
 @app.route('/api/doctors')
@@ -121,13 +139,19 @@ def get_doctors():
     
     # Filter by insurance acceptance
     insurance_mapping = {
-        'carefirst': Doctor.takes_carefirst,
-        'united_healthcare': Doctor.takes_united_healthcare,
-        'aetna': Doctor.takes_aetna,
-        'cigna': Doctor.takes_cigna,
-        'bcbs': Doctor.takes_bcbs,
-        'medicare': Doctor.takes_medicare,
-        'medicaid': Doctor.takes_medicaid
+        'carefirst_community_healthplan': Doctor.takes_carefirst_community_healthplan,
+        'united_healthcare_community': Doctor.takes_united_healthcare_community,
+        'priority_partners': Doctor.takes_priority_partners,
+        'maryland_physicians_care': Doctor.takes_maryland_physicians_care,
+        'aetna_betterhealth': Doctor.takes_aetna_betterhealth,
+        'maryland_medical_assistance': Doctor.takes_maryland_medical_assistance,
+        'wellpoint': Doctor.takes_wellpoint,
+        'aetna_medicare': Doctor.takes_aetna_medicare,
+        'carefirst_medicare': Doctor.takes_carefirst_medicare,
+        'cigna_medicare': Doctor.takes_cigna_medicare,
+        'humana': Doctor.takes_humana,
+        'john_hopkins': Doctor.takes_john_hopkins,
+        'united_healthcare_medicare': Doctor.takes_united_healthcare_medicare
     }
     
     if insurance in insurance_mapping:
@@ -163,13 +187,19 @@ def add_doctor():
             address=data['address'],
             phone=data['phone'],
             fax=data['fax'],
-            takes_carefirst=data.get('takes_carefirst', False),
-            takes_united_healthcare=data.get('takes_united_healthcare', False),
-            takes_aetna=data.get('takes_aetna', False),
-            takes_cigna=data.get('takes_cigna', False),
-            takes_bcbs=data.get('takes_bcbs', False),
-            takes_medicare=data.get('takes_medicare', False),
-            takes_medicaid=data.get('takes_medicaid', False)
+            takes_carefirst_community_healthplan=data.get('takes_carefirst_community_healthplan', False),
+            takes_united_healthcare_community=data.get('takes_united_healthcare_community', False),
+            takes_priority_partners=data.get('takes_priority_partners', False),
+            takes_maryland_physicians_care=data.get('takes_maryland_physicians_care', False),
+            takes_aetna_betterhealth=data.get('takes_aetna_betterhealth', False),
+            takes_maryland_medical_assistance=data.get('takes_maryland_medical_assistance', False),
+            takes_wellpoint=data.get('takes_wellpoint', False),
+            takes_aetna_medicare=data.get('takes_aetna_medicare', False),
+            takes_carefirst_medicare=data.get('takes_carefirst_medicare', False),
+            takes_cigna_medicare=data.get('takes_cigna_medicare', False),
+            takes_humana=data.get('takes_humana', False),
+            takes_john_hopkins=data.get('takes_john_hopkins', False),
+            takes_united_healthcare_medicare=data.get('takes_united_healthcare_medicare', False)
         )
         
         db.session.add(doctor)
@@ -201,20 +231,32 @@ def update_doctor(doctor_id):
             doctor.fax = data['fax']
         
         # Update insurance fields
-        if 'takes_carefirst' in data:
-            doctor.takes_carefirst = data['takes_carefirst']
-        if 'takes_united_healthcare' in data:
-            doctor.takes_united_healthcare = data['takes_united_healthcare']
-        if 'takes_aetna' in data:
-            doctor.takes_aetna = data['takes_aetna']
-        if 'takes_cigna' in data:
-            doctor.takes_cigna = data['takes_cigna']
-        if 'takes_bcbs' in data:
-            doctor.takes_bcbs = data['takes_bcbs']
-        if 'takes_medicare' in data:
-            doctor.takes_medicare = data['takes_medicare']
-        if 'takes_medicaid' in data:
-            doctor.takes_medicaid = data['takes_medicaid']
+        if 'takes_carefirst_community_healthplan' in data:
+            doctor.takes_carefirst_community_healthplan = data['takes_carefirst_community_healthplan']
+        if 'takes_united_healthcare_community' in data:
+            doctor.takes_united_healthcare_community = data['takes_united_healthcare_community']
+        if 'takes_priority_partners' in data:
+            doctor.takes_priority_partners = data['takes_priority_partners']
+        if 'takes_maryland_physicians_care' in data:
+            doctor.takes_maryland_physicians_care = data['takes_maryland_physicians_care']
+        if 'takes_aetna_betterhealth' in data:
+            doctor.takes_aetna_betterhealth = data['takes_aetna_betterhealth']
+        if 'takes_maryland_medical_assistance' in data:
+            doctor.takes_maryland_medical_assistance = data['takes_maryland_medical_assistance']
+        if 'takes_wellpoint' in data:
+            doctor.takes_wellpoint = data['takes_wellpoint']
+        if 'takes_aetna_medicare' in data:
+            doctor.takes_aetna_medicare = data['takes_aetna_medicare']
+        if 'takes_carefirst_medicare' in data:
+            doctor.takes_carefirst_medicare = data['takes_carefirst_medicare']
+        if 'takes_cigna_medicare' in data:
+            doctor.takes_cigna_medicare = data['takes_cigna_medicare']
+        if 'takes_humana' in data:
+            doctor.takes_humana = data['takes_humana']
+        if 'takes_john_hopkins' in data:
+            doctor.takes_john_hopkins = data['takes_john_hopkins']
+        if 'takes_united_healthcare_medicare' in data:
+            doctor.takes_united_healthcare_medicare = data['takes_united_healthcare_medicare']
         
         db.session.commit()
         
@@ -241,13 +283,15 @@ def delete_doctor(doctor_id):
 def init_db():
     """Initialize database with sample data"""
     with app.app_context():
+        # Drop all tables and recreate them to handle schema changes
+        db.drop_all()
         db.create_all()
         
         # Check if data already exists
         if Doctor.query.first():
             return
         
-        # Sample doctors data
+        # Sample doctors data with Maryland-specific insurance plans
         sample_doctors = [
             {
                 'name': 'Dr. John Smith',
@@ -255,10 +299,9 @@ def init_db():
                 'address': '123 Heart Lane, Waldorf, MD 20602',
                 'phone': '301-555-0101',
                 'fax': '301-555-0102',
-                'takes_carefirst': True,
-                'takes_united_healthcare': False,
-                'takes_aetna': True,
-                'takes_medicare': True
+                'takes_carefirst_community_healthplan': True,
+                'takes_aetna_medicare': True,
+                'takes_maryland_medical_assistance': True
             },
             {
                 'name': 'Dr. Sarah Johnson',
@@ -266,10 +309,9 @@ def init_db():
                 'address': '456 Stomach St, Silver Spring, MD 20910',
                 'phone': '301-555-0201',
                 'fax': '301-555-0202',
-                'takes_carefirst': True,
-                'takes_united_healthcare': True,
-                'takes_cigna': True,
-                'takes_medicare': True
+                'takes_priority_partners': True,
+                'takes_united_healthcare_medicare': True,
+                'takes_maryland_physicians_care': True
             },
             {
                 'name': 'Dr. Michael Brown',
@@ -277,10 +319,9 @@ def init_db():
                 'address': '789 Cardiac Ave, Bethesda, MD 20814',
                 'phone': '301-555-0301',
                 'fax': '301-555-0302',
-                'takes_united_healthcare': True,
-                'takes_aetna': True,
-                'takes_bcbs': True,
-                'takes_medicare': True
+                'takes_humana': True,
+                'takes_carefirst_medicare': True,
+                'takes_aetna_betterhealth': True
             },
             {
                 'name': 'Dr. Emily Davis',
@@ -288,34 +329,9 @@ def init_db():
                 'address': '321 Skin Way, Rockville, MD 20850',
                 'phone': '301-555-0401',
                 'fax': '301-555-0402',
-                'takes_carefirst': True,
-                'takes_united_healthcare': False,
-                'takes_aetna': True,
-                'takes_medicaid': True
-            },
-            {
-                'name': 'Dr. Robert Wilson',
-                'specialty': 'Gastroenterology',
-                'address': '654 Digestive Dr, Annapolis, MD 21401',
-                'phone': '410-555-0501',
-                'fax': '410-555-0502',
-                'takes_carefirst': False,
-                'takes_united_healthcare': True,
-                'takes_cigna': True,
-                'takes_bcbs': True,
-                'takes_medicare': True
-            },
-            {
-                'name': 'Dr. Lisa Anderson',
-                'specialty': 'Neurology',
-                'address': '987 Brain Blvd, Baltimore, MD 21201',
-                'phone': '410-555-0601',
-                'fax': '410-555-0602',
-                'takes_carefirst': True,
-                'takes_united_healthcare': True,
-                'takes_aetna': False,
-                'takes_medicare': True,
-                'takes_medicaid': True
+                'takes_united_healthcare_community': True,
+                'takes_wellpoint': True,
+                'takes_john_hopkins': True
             }
         ]
         
