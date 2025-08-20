@@ -466,7 +466,9 @@
                     </div>
                     <div class="form-col">
                         <label for="doctorSpecialty">Specialty:</label>
-                        <input type="text" id="doctorSpecialty" required>
+                        <select id="doctorSpecialty" required>
+                            <option value="">Select a specialty...</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -545,6 +547,9 @@
                 const specialties = await response.json();
                 const select = document.getElementById('specialty');
                 
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">Select a specialty...</option>';
+                
                 specialties.forEach(specialty => {
                     const option = document.createElement('option');
                     option.value = specialty;
@@ -553,6 +558,29 @@
                 });
             } catch (error) {
                 console.error('Error loading specialties:', error);
+            }
+        }
+
+        async function loadSpecialtiesForForm() {
+            try {
+                const response = await fetch('/api/specialties');
+                const specialties = await response.json();
+                const select = document.getElementById('doctorSpecialty');
+                
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">Select a specialty...</option>';
+                
+                specialties.forEach(specialty => {
+                    const option = document.createElement('option');
+                    option.value = specialty;
+                    option.textContent = specialty;
+                    select.appendChild(option);
+                });
+                
+                return Promise.resolve();
+            } catch (error) {
+                console.error('Error loading specialties for form:', error);
+                return Promise.reject(error);
             }
         }
 
@@ -665,6 +693,7 @@
             document.getElementById('doctorFormTitle').textContent = 'Add New Doctor';
             document.getElementById('doctorForm').reset();
             document.getElementById('formMessages').innerHTML = '';
+            loadSpecialtiesForForm();
             document.getElementById('doctorFormModal').style.display = 'block';
         }
 
@@ -672,21 +701,23 @@
             currentEditingDoctorId = doctor.id;
             document.getElementById('doctorFormTitle').textContent = 'Edit Doctor';
             
-            // Populate form with doctor data
-            document.getElementById('doctorName').value = doctor.name;
-            document.getElementById('doctorSpecialty').value = doctor.specialty;
-            document.getElementById('doctorAddress').value = doctor.address;
-            document.getElementById('doctorPhone').value = doctor.phone;
-            document.getElementById('doctorFax').value = doctor.fax;
+            loadSpecialtiesForForm().then(() => {
+                // Populate form with doctor data after specialties are loaded
+                document.getElementById('doctorName').value = doctor.name;
+                document.getElementById('doctorSpecialty').value = doctor.specialty;
+                document.getElementById('doctorAddress').value = doctor.address;
+                document.getElementById('doctorPhone').value = doctor.phone;
+                document.getElementById('doctorFax').value = doctor.fax;
             
-            // Set insurance checkboxes
-            document.getElementById('takes_carefirst').checked = doctor.insurance.carefirst;
-            document.getElementById('takes_united_healthcare').checked = doctor.insurance.united_healthcare;
-            document.getElementById('takes_aetna').checked = doctor.insurance.aetna;
-            document.getElementById('takes_cigna').checked = doctor.insurance.cigna;
-            document.getElementById('takes_bcbs').checked = doctor.insurance.bcbs;
-            document.getElementById('takes_medicare').checked = doctor.insurance.medicare;
-            document.getElementById('takes_medicaid').checked = doctor.insurance.medicaid;
+                // Set insurance checkboxes
+                document.getElementById('takes_carefirst').checked = doctor.insurance.carefirst;
+                document.getElementById('takes_united_healthcare').checked = doctor.insurance.united_healthcare;
+                document.getElementById('takes_aetna').checked = doctor.insurance.aetna;
+                document.getElementById('takes_cigna').checked = doctor.insurance.cigna;
+                document.getElementById('takes_bcbs').checked = doctor.insurance.bcbs;
+                document.getElementById('takes_medicare').checked = doctor.insurance.medicare;
+                document.getElementById('takes_medicaid').checked = doctor.insurance.medicaid;
+            });
             
             document.getElementById('formMessages').innerHTML = '';
             document.getElementById('doctorFormModal').style.display = 'block';
@@ -791,8 +822,6 @@
                     setTimeout(() => {
                         closeDoctorFormModal();
                         loadAllDoctors();
-                        // Refresh the specialty dropdown in case a new specialty was added
-                        loadSpecialties();
                     }, 1500);
                 } else {
                     document.getElementById('formMessages').innerHTML = `
@@ -821,8 +850,6 @@
                 
                 if (response.ok) {
                     loadAllDoctors();
-                    // Refresh the specialty dropdown in case we deleted the last doctor of a specialty
-                    loadSpecialties();
                 } else {
                     alert(`Error: ${result.error}`);
                 }

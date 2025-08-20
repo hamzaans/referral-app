@@ -57,9 +57,42 @@ def index():
 
 @app.route('/api/specialties')
 def get_specialties():
-    """Get all unique specialties"""
-    specialties = db.session.query(Doctor.specialty).distinct().all()
-    return jsonify([s[0] for s in specialties])
+    """Get all available specialties"""
+    # Predefined list of medical specialties
+    specialties = [
+        'Allergy and Immunology',
+        'Anesthesiology',
+        'Cardiology',
+        'Cardiothoracic Surgery',
+        'Dermatology',
+        'Emergency Medicine',
+        'Endocrinology',
+        'Family Medicine',
+        'Gastroenterology',
+        'General Surgery',
+        'Geriatrics',
+        'Hematology/Oncology',
+        'Infectious Disease',
+        'Internal Medicine',
+        'Nephrology',
+        'Neurology',
+        'Neurosurgery',
+        'Obstetrics and Gynecology',
+        'Ophthalmology',
+        'Orthopedic Surgery',
+        'Otolaryngology (ENT)',
+        'Pathology',
+        'Pediatrics',
+        'Physical Medicine and Rehabilitation',
+        'Plastic Surgery',
+        'Psychiatry',
+        'Pulmonology',
+        'Radiology',
+        'Rheumatology',
+        'Urology',
+        'Vascular Surgery'
+    ]
+    return jsonify(sorted(specialties))
 
 @app.route('/api/insurances')
 def get_insurances():
