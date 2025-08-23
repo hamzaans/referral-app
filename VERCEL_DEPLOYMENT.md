@@ -34,8 +34,9 @@ vercel
 vercel --prod
 ```
 
-## Troubleshooting NOT_FOUND Errors
+## Troubleshooting Deployment Errors
 
+### NOT_FOUND Errors
 If you encounter a "NOT_FOUND" error during deployment:
 
 1. **Check the build logs** in the Vercel dashboard for specific error messages
@@ -44,10 +45,19 @@ If you encounter a "NOT_FOUND" error during deployment:
 4. **Verify dependencies** - all packages in requirements.txt should be compatible
 5. **Check the wsgi.py file** - this is the entry point for Vercel
 
+### FUNCTION_INVOCATION_FAILED Errors (500 Internal Server Error)
+If you encounter a "FUNCTION_INVOCATION_FAILED" error:
+
+1. **Check function logs** in the Vercel dashboard
+2. **Database issues**: The app now uses in-memory database for Vercel
+3. **Import errors**: Check for missing dependencies
+4. **Memory issues**: The simplified app uses less memory
+
 ### Common Solutions:
 - **Clear Vercel cache**: Delete the `.vercel` folder and redeploy
 - **Check build output**: Look for any import errors or missing dependencies
 - **Verify routes**: Ensure the vercel.json routing is correct
+- **Use simplified app**: The app_simple.py is optimized for serverless deployment
 
 ## Important Notes
 

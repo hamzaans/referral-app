@@ -102,75 +102,65 @@ def get_specialties():
         'Physical Medicine and Rehabilitation',
         'Plastic Surgery',
         'Psychiatry',
-        'Pulmonology',
+        'Pulmonary Medicine',
+        'Radiation Oncology',
         'Radiology',
         'Rheumatology',
         'Urology',
         'Vascular Surgery'
     ]
-    return jsonify(sorted(specialties))
+    return jsonify(specialties)
 
-@app.route('/api/insurances')
-def get_insurances():
-    """Get all available insurance options"""
-    return jsonify([
-        'carefirst_community_healthplan',
-        'united_healthcare_community',
-        'priority_partners',
-        'maryland_physicians_care',
-        'aetna_betterhealth',
-        'maryland_medical_assistance',
-        'wellpoint',
-        'aetna_medicare',
-        'carefirst_medicare',
-        'cigna_medicare',
-        'humana',
-        'john_hopkins',
-        'united_healthcare_medicare'
-    ])
-
-@app.route('/api/doctors')
+@app.route('/api/doctors', methods=['GET'])
 def get_doctors():
-    """Get doctors by specialty and insurance"""
-    specialty = request.args.get('specialty')
-    insurance = request.args.get('insurance')
-    
-    if not specialty or not insurance:
-        return jsonify({'error': 'Both specialty and insurance are required'}), 400
-    
-    # Build query based on specialty and insurance
-    query = Doctor.query.filter(Doctor.specialty == specialty)
-    
-    # Filter by insurance acceptance
-    insurance_mapping = {
-        'carefirst_community_healthplan': Doctor.takes_carefirst_community_healthplan,
-        'united_healthcare_community': Doctor.takes_united_healthcare_community,
-        'priority_partners': Doctor.takes_priority_partners,
-        'maryland_physicians_care': Doctor.takes_maryland_physicians_care,
-        'aetna_betterhealth': Doctor.takes_aetna_betterhealth,
-        'maryland_medical_assistance': Doctor.takes_maryland_medical_assistance,
-        'wellpoint': Doctor.takes_wellpoint,
-        'aetna_medicare': Doctor.takes_aetna_medicare,
-        'carefirst_medicare': Doctor.takes_carefirst_medicare,
-        'cigna_medicare': Doctor.takes_cigna_medicare,
-        'humana': Doctor.takes_humana,
-        'john_hopkins': Doctor.takes_john_hopkins,
-        'united_healthcare_medicare': Doctor.takes_united_healthcare_medicare
-    }
-    
-    if insurance in insurance_mapping:
-        query = query.filter(insurance_mapping[insurance] == True)
-    else:
-        return jsonify({'error': 'Invalid insurance type'}), 400
-    
-    doctors = query.all()
-    return jsonify([doctor.to_dict() for doctor in doctors])
-
-@app.route('/api/doctors/all')
-def get_all_doctors():
-    """Get all doctors for admin purposes"""
-    doctors = Doctor.query.all()
-    return jsonify([doctor.to_dict() for doctor in doctors])
+    """Get all doctors with optional filtering"""
+    try:
+        # Initialize database if needed
+        with app.app_context():
+            db.create_all()
+        
+        specialty = request.args.get('specialty')
+        insurance = request.args.get('insurance')
+        
+        query = Doctor.query
+        
+        if specialty and specialty != 'All':
+            query = query.filter(Doctor.specialty == specialty)
+        
+        if insurance:
+            # Filter by insurance acceptance
+            if insurance == 'carefirst_community_healthplan':
+                query = query.filter(Doctor.takes_carefirst_community_healthplan == True)
+            elif insurance == 'united_healthcare_community':
+                query = query.filter(Doctor.takes_united_healthcare_community == True)
+            elif insurance == 'priority_partners':
+                query = query.filter(Doctor.takes_priority_partners == True)
+            elif insurance == 'maryland_physicians_care':
+                query = query.filter(Doctor.takes_maryland_physicians_care == True)
+            elif insurance == 'aetna_betterhealth':
+                query = query.filter(Doctor.takes_aetna_betterhealth == True)
+            elif insurance == 'maryland_medical_assistance':
+                query = query.filter(Doctor.takes_maryland_medical_assistance == True)
+            elif insurance == 'wellpoint':
+                query = query.filter(Doctor.takes_wellpoint == True)
+            elif insurance == 'aetna_medicare':
+                query = query.filter(Doctor.takes_aetna_medicare == True)
+            elif insurance == 'carefirst_medicare':
+                query = query.filter(Doctor.takes_carefirst_medicare == True)
+            elif insurance == 'cigna_medicare':
+                query = query.filter(Doctor.takes_cigna_medicare == True)
+            elif insurance == 'humana':
+                query = query.filter(Doctor.takes_humana == True)
+            elif insurance == 'john_hopkins':
+                query = query.filter(Doctor.takes_john_hopkins == True)
+            elif insurance == 'united_healthcare_medicare':
+                query = query.filter(Doctor.takes_united_healthcare_medicare == True)
+        
+        doctors = query.all()
+        return jsonify([doctor.to_dict() for doctor in doctors])
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/doctors', methods=['POST'])
 def add_doctor():
@@ -178,13 +168,10 @@ def add_doctor():
     try:
         data = request.get_json()
         
-        # Validate required fields
-        required_fields = ['name', 'specialty', 'address', 'phone', 'fax']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'error': f'{field} is required'}), 400
+        # Initialize database if needed
+        with app.app_context():
+            db.create_all()
         
-        # Create new doctor
         doctor = Doctor(
             name=data['name'],
             specialty=data['specialty'],
@@ -209,7 +196,7 @@ def add_doctor():
         db.session.add(doctor)
         db.session.commit()
         
-        return jsonify({'message': 'Doctor added successfully', 'doctor': doctor.to_dict()}), 201
+        return jsonify({'message': 'Doctor added successfully', 'doctor': doctor.to_dict()})
         
     except Exception as e:
         db.session.rollback()
@@ -217,12 +204,12 @@ def add_doctor():
 
 @app.route('/api/doctors/<int:doctor_id>', methods=['PUT'])
 def update_doctor(doctor_id):
-    """Update an existing doctor"""
+    """Update a doctor"""
     try:
-        doctor = Doctor.query.get_or_404(doctor_id)
         data = request.get_json()
+        doctor = Doctor.query.get_or_404(doctor_id)
         
-        # Update fields if provided
+        # Update basic fields
         if 'name' in data:
             doctor.name = data['name']
         if 'specialty' in data:
@@ -284,78 +271,53 @@ def delete_doctor(doctor_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-def init_db():
-    """Initialize database with sample data"""
-    with app.app_context():
-        try:
-            # Drop all tables and recreate them to handle schema changes
-            db.drop_all()
+def init_sample_data():
+    """Initialize sample data if database is empty"""
+    try:
+        with app.app_context():
             db.create_all()
             
             # Check if data already exists
             if Doctor.query.first():
                 return
             
-            # Sample doctors data with Maryland-specific insurance plans
+            # Sample doctors data
             sample_doctors = [
-            {
-                'name': 'Dr. John Smith',
-                'specialty': 'Cardiology',
-                'address': '123 Heart Lane, Waldorf, MD 20602',
-                'phone': '301-555-0101',
-                'fax': '301-555-0102',
-                'takes_carefirst_community_healthplan': True,
-                'takes_aetna_medicare': True,
-                'takes_maryland_medical_assistance': True
-            },
-            {
-                'name': 'Dr. Sarah Johnson',
-                'specialty': 'Gastroenterology',
-                'address': '456 Stomach St, Silver Spring, MD 20910',
-                'phone': '301-555-0201',
-                'fax': '301-555-0202',
-                'takes_priority_partners': True,
-                'takes_united_healthcare_medicare': True,
-                'takes_maryland_physicians_care': True
-            },
-            {
-                'name': 'Dr. Michael Brown',
-                'specialty': 'Cardiology',
-                'address': '789 Cardiac Ave, Bethesda, MD 20814',
-                'phone': '301-555-0301',
-                'fax': '301-555-0302',
-                'takes_humana': True,
-                'takes_carefirst_medicare': True,
-                'takes_aetna_betterhealth': True
-            },
-            {
-                'name': 'Dr. Emily Davis',
-                'specialty': 'Dermatology',
-                'address': '321 Skin Way, Rockville, MD 20850',
-                'phone': '301-555-0401',
-                'fax': '301-555-0402',
-                'takes_united_healthcare_community': True,
-                'takes_wellpoint': True,
-                'takes_john_hopkins': True
-            }
-        ]
-        
-        for doctor_data in sample_doctors:
-            doctor = Doctor(**doctor_data)
-            db.session.add(doctor)
-        
-        db.session.commit()
-        print("Database initialized with sample data")
-        except Exception as e:
-            print(f"Error initializing database: {e}")
-            # Continue without sample data if there's an error
+                {
+                    'name': 'Dr. John Smith',
+                    'specialty': 'Cardiology',
+                    'address': '123 Heart Lane, Waldorf, MD 20602',
+                    'phone': '301-555-0101',
+                    'fax': '301-555-0102',
+                    'takes_carefirst_community_healthplan': True,
+                    'takes_aetna_medicare': True,
+                    'takes_maryland_medical_assistance': True
+                },
+                {
+                    'name': 'Dr. Sarah Johnson',
+                    'specialty': 'Gastroenterology',
+                    'address': '456 Stomach St, Silver Spring, MD 20910',
+                    'phone': '301-555-0201',
+                    'fax': '301-555-0202',
+                    'takes_priority_partners': True,
+                    'takes_united_healthcare_medicare': True,
+                    'takes_maryland_physicians_care': True
+                }
+            ]
+            
+            for doctor_data in sample_doctors:
+                doctor = Doctor(**doctor_data)
+                db.session.add(doctor)
+            
+            db.session.commit()
+            print("Sample data initialized")
+    except Exception as e:
+        print(f"Error initializing sample data: {e}")
 
-# Initialize database when the app starts
-try:
-    init_db()
-except Exception as e:
-    print(f"Warning: Could not initialize database: {e}")
+# Initialize sample data on first request
+@app.before_first_request
+def before_first_request():
+    init_sample_data()
 
-# For Vercel deployment
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
